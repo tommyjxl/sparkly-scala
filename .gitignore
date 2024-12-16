@@ -1,0 +1,12 @@
+/tmp
+/.idea
+/.bsp
+*.cache
+*.class
+/target/global-logging
+/project/target/streams
+/project/target/scala-2.12/sbt-1.0/update
+/project/target/scala-2.12/sbt-1.0/sync
+target/streams/_global/ivyConfiguration/_global/streams/out
+/target/scala-2.12/update
+/target/streams
