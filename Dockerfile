@@ -4,8 +4,8 @@ ENV SPARK_VERSION=3.5.3
 ENV SCALA_VERSION=2.12.18
 ENV HADOOP_VERSION=3
 
-ENV UTOPIA_TEMP_DIR="/opt/tmp"
-ENV UTOPIA_ARTIFACTS_DIR="/opt/artifacts"
+ENV TOU_TEMP_DIR="/opt/tmp"
+ENV TOU_ARTIFACTS_DIR="/opt/artifacts"
 
 # procps (ps command) is not included in the slim package.
 # needed because ps ../load-spark-env.sh is called when running the Spark app
@@ -32,20 +32,16 @@ ENV PATH="/opt/spark/bin:/opt/scala/bin:${PATH}"
 
 WORKDIR /opt
 
-# Run the application
-#COPY src2/SimpleWordCount.jar /opt/spark/SimpleWordCount.jar
-#COPY src2/SimpleWordCount.jar /opt/SimpleWordCount.jar
-#COPY src2/SimpleWordCount.jar /SimpleWordCount.jar
-
-#RUN ls /opt/
-
 COPY src /opt/src
-COPY artifacts ${UTOPIA_ARTIFACTS_DIR}
+COPY artifacts ${TOU_ARTIFACTS_DIR}
 
-# Compile into jar file
-RUN scalac -cp "/opt/spark/jars/*" /opt/src/main/scala/UtopiaApp.scala -d UtopiaApp.jar
+# Compile into fat jar file
+RUN scalac -cp "/opt/spark/jars/*" src/main/scala/com/tou/global/*.scala src/main/scala/com/tou/producer/*.scala src/main/scala/com/tou/processor/*.scala -d tou-app.jar
 
 RUN ls /opt/
+
 # Run the Spark app
-CMD ["spark-submit", "--class", "UtopiaApp", "UtopiaApp.jar"]
+CMD ["spark-submit", "--class", "com.tou.processor.DemoApp", "--master", "local[*]", "tou-app.jar", "3"]
+
+
 

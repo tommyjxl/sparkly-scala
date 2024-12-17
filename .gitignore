@@ -10,3 +10,5 @@
 target/streams/_global/ivyConfiguration/_global/streams/out
 /target/scala-2.12/update
 /target/streams
+/artifacts
+/target
