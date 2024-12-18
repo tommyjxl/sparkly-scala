@@ -1,6 +1,7 @@
 name := "tou-app"
 version := "1.0"
-scalaVersion := "2.12.18"
+
+scalaVersion := "2.13.15"
 val sparkVersion = "3.5.3"
 
 libraryDependencies ++= Seq(
@@ -10,7 +11,7 @@ libraryDependencies ++= Seq(
 )
 
 // for creating fat jar via sbt assembly (requires a plugin: refer to project/plugins.sbt)
-assemblyMergeStrategy in assembly := {
+assembly / assemblyMergeStrategy := {
   case PathList("META-INF", xs @ _*) => MergeStrategy.discard
-  case x => MergeStrategy.deduplicate
+  case x                             => MergeStrategy.deduplicate
 }

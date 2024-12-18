@@ -1,4 +1,4 @@
-# sparkly-scala
+# sparkly-scala ("Town of Utopia" solution)
 Demo application to solve the "Town of Utopia" problems, including:
 - Generating two datasets:
   - Video camera data with geolocation ID
@@ -15,6 +15,13 @@ Main requirements:
 todo
 
 ## Local environment setup (Windows)
+Compatible versions:
+- JDK 11
+- Scala 2.13.15
+- Spark 3.5.3
+- Docker Engine 27.3.1
+- Docker Desktop 4.36.0
+
 Download and install the latest stable releases of the following:
 - [Java Developer Kit 11 (JDK)](https://www.oracle.com/sg/java/technologies/javase/jdk11-archive-downloads.html)
   - Note: Do not use a later version! Version 11 is used to bypass this permission error specific to creating a spark context on Windows: `java.lang.UnsupportedOperationException: getSubject is supported only if a security manager is allowed` (ref: [StackOverflow reference](https://stackoverflow.com/a/79017758))
@@ -22,6 +29,8 @@ Download and install the latest stable releases of the following:
   - Verify that `java -version` is as expected
 - [Scala](https://www.scala-lang.org/download/)
   - Verify that `scala -version` is as expected
+  - Use [sbt scalastyle](http://www.scalastyle.org/sbt.html) for checking scala style warnings
+  - Use [scalafmt](https://scalameta.org/scalafmt/docs/installation.html) formatter for auto-linting
 - [Apache Spark](https://spark.apache.org/downloads.html)
   - _For package type, choose "Pre-built for Apache Hadoop \<major\>.\<minor\> and later (Scala \<major\>.\<minor\>)"_
   - Set `SPARK_HOME` env var based on the parent dir of the `bin` directory
@@ -53,7 +62,7 @@ Download and install the latest stable releases of the following:
     log4j.logger.io.netty=WARN
     ```
   - Specify the logging level as part of the spark-submit conf
-    - eg. `spark-submit --conf "spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/C:/spark/conf/log4j.properties" --conf "spark.executor.extraJavaOptions=-Dlog4j.configuration=file:/C:/spark/conf/log4j.properties" --class com.tou.processor.DemoApp --master local[*] tou-app.jar`
+    - eg. `spark-submit --conf "spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/C:/spark/conf/log4j.properties" --conf "spark.executor.extraJavaOptions=-Dlog4j.configuration=file:/C:/spark/conf/log4j.properties" --class com.tou.App --master local[*] tou-app.jar`
 
 ## Running the scala application
 ### Local (Windows)
@@ -67,15 +76,12 @@ Download and install the latest stable releases of the following:
   - Verify that `tou-app.jar` was created
   - Using `sbt`:
     ```bash
-      sbt clean
-      sbt compile
-      sbt package
-      sbt assembly
+      sbt clean assembly
     ```
-   - Verify that `target/scala-2.12/tou-app-assembly-1.0.jar` was created
-- Run: `spark-submit --class com.tou.processor.DemoApp --master local[*] <path/to/jar> <topItemCount>`
-  - eg. `spark-submit --class com.tou.processor.DemoApp --master local[*] target/scala-2.12/tou-app-assembly-1.0.jar 3`
-
+   - Verify that `target/scala-2.13/tou-app-assembly-1.0.jar` was created
+- Run: `spark-submit --class com.tou.App --master local[*] <path/to/jar> <topItemCount> <inputGeolocationFilePath> <inputVideoCameraItemsDetectedFilePath> <outputVideoCameraItemsDetectedByLocationFilePath> <outputTopItemsFilePath>`
+  - Example: `spark-submit --class com.tou.App --master local[*] tou-app.jar 3 /opt/geolocation.parquet /opt/videoCameraItemsDetected.parquet /opt/videoCameraItemsDetectedByLocation.parquet /opt/topItems.parquet`
+  - Example (with custom log4j settings): `spark-submit --conf "spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/C:/spark/conf/log4j.properties" --conf "spark.executor.extraJavaOptions=-Dlog4j.configuration=file:/C:/spark/conf/log4j.properties" --class com.tou.App --master local[*] target/scala-2.13/tou-app-assembly-1.0.jar 3 artifacts/geolocation.parquet artifacts/videoCameraItemsDetected.parquet /opt/videoCameraItemsDetectedByLocation.parquet /opt/topItems.parquet`
 ### Containerized
 - Run Docker Desktop
 - Build: `docker build --progress=plain -t tou-app:latest .`

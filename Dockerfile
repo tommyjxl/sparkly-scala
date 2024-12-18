@@ -36,12 +36,10 @@ COPY src /opt/src
 COPY artifacts ${TOU_ARTIFACTS_DIR}
 
 # Compile into fat jar file
-RUN scalac -cp "/opt/spark/jars/*" src/main/scala/com/tou/global/*.scala src/main/scala/com/tou/producer/*.scala src/main/scala/com/tou/processor/*.scala -d tou-app.jar
+RUN scalac -cp "/opt/spark/jars/*" src/main/scala/com/tou/global/*.scala src/main/scala/com/tou/producer/*.scala src/main/scala/com/tou/*.scala -d tou-app.jar
 
 RUN ls /opt/
+RUN ls ${TOU_ARTIFACTS_DIR}
 
 # Run the Spark app
-CMD ["spark-submit", "--class", "com.tou.processor.DemoApp", "--master", "local[*]", "tou-app.jar", "3"]
-
-
-
+CMD ["spark-submit", "--class", "com.tou.App", "--master", "local[*]", "tou-app.jar", "3", "/opt/artifacts/geolocation.parquet", "/opt/artifacts/videoCameraItemsDetected.parquet", "/opt/artifacts/videoCameraItemsDetectedByLocation.parquet", "/opt/artifacts/topItems.parquet"]
