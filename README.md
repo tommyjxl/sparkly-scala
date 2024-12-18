@@ -19,14 +19,17 @@ C4Context
     
     Person(developer, "Developer", "Maintains the Spark application")
     Person(stakeholder, "Stakeholder", "A consumer of the data produced by the 'Town of Utopia' solution")
-    System(sparkly_scala, "Spark application", "Application that generates and transforms data")
-    System(data_interface, "Data interface", "Visualizaton and delivery of reporting data")
-  
+    System_Boundary(utopia, "Town of Utopia solution") {
+      System(sparkly_scala, "Spark application", "Application that generates and transforms data")
+      System(data_interface, "Data interface", "Visualization and delivery of reporting data")
+    }
+    
     Rel(developer, sparkly_scala, "Operates")
     Rel(developer, data_interface, "Operates")
     Rel(stakeholder, data_interface, "Uses")
+    Rel(data_interface, sparkly_scala, "Fetches data from")
 
-
+    UpdateLayoutConfig($c4ShapeInRow="2", $c4BoundaryInRow="1")
 ```
 
 ## Local environment setup (Windows)
