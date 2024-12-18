@@ -7,7 +7,12 @@ import org.apache.spark.sql.{AnalysisException, DataFrame, Row, SparkSession}
 
 import scala.util.Random
 
-class DataProducer(spark: SparkSession) {
+class DataProducer(
+    spark: SparkSession,
+    randomSeed: Long = System.currentTimeMillis()
+) {
+  private val random = new Random(randomSeed)
+
   def dfToParquet(df: DataFrame, filePath: String): Unit = {
     df.write.mode("overwrite").parquet(filePath)
     println(s"DataFrame written to Parquet file at: $filePath")
@@ -27,16 +32,15 @@ class DataProducer(spark: SparkSession) {
   private def createVideoCameraItemsDetectedRdd(
       rowCount: Int = 1000000
   ): RDD[Row] = {
-    val random = new Random()
     val possibleItemNames =
       Seq("ItemName1", "ItemName2", "ItemName3", "ItemName4", "ItemName5")
     val rowData = (1 to rowCount).map { _ =>
       Row(
-        10L + (random.nextLong() % (110L - 10L)),
-        random.nextInt(),
-        random.nextInt(),
-        possibleItemNames(random.nextInt(possibleItemNames.length)),
-        random.nextInt()
+        10L + (this.random.nextLong() % (110L - 10L)),
+        this.random.nextInt(),
+        this.random.nextInt(),
+        possibleItemNames(this.random.nextInt(possibleItemNames.length)),
+        this.random.nextInt()
       )
     }
     val rdd = spark.sparkContext.parallelize(rowData)
@@ -44,13 +48,12 @@ class DataProducer(spark: SparkSession) {
   }
 
   private def createGeolocationRdd(rowCount: Int = 1000): RDD[Row] = {
-    val random = new Random()
     val possibleLocations =
       Seq("StreetA", "StreetB", "StreetC", "StreetD", "StreetE")
     val rowData = (1 to rowCount).map { _ =>
       Row(
-        10L + (random.nextLong() % (110L - 10L)),
-        possibleLocations(random.nextInt(possibleLocations.length))
+        10L + (this.random.nextLong() % (110L - 10L)),
+        possibleLocations(this.random.nextInt(possibleLocations.length))
       )
     }
     val rdd = spark.sparkContext.parallelize(rowData)

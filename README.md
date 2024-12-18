@@ -1,18 +1,33 @@
-# sparkly-scala ("Town of Utopia" solution)
-Demo application to solve the "Town of Utopia" problems, including:
+# sparkly-scala
+Spark application to solve "Town of Utopia" data problems, including:
 - Generating two datasets:
   - Video camera data with geolocation ID
   - Geolocation mapping (ID -> geolocation names) 
 - Augmenting the video camera data with geolocation names
 - Finding the most common item names detected by video cameras
 
-Main requirements:
-- The application must be completely written in Scala, parametrized and generalized
+Hard requirements:
+- The Spark application must be written in Scala, with inputs and outputs parametrized and generalized
 - All data transformations (excluding file I/O and logging) must be done using Resilient Distributed Datasets (RDDs)
-- The video camera data should be augmented with minimal time/space complexity, and shuffling of data
+- The video camera data should be augmented with minimal time/space complexity, and minimal shuffling of data
 
 ## Architecture overview
-todo
+System context:
+```mermaid
+C4Context
+    title System Context diagram for "Town of Utopia" solution
+    
+    Person(developer, "Developer", "Maintains the Spark application")
+    Person(stakeholder, "Stakeholder", "A consumer of the data produced by the 'Town of Utopia' solution")
+    System(sparkly_scala, "Spark application", "Application that generates and transforms data")
+    System(data_interface, "Data interface", "Visualizaton and delivery of reporting data")
+  
+    Rel(developer, sparkly_scala, "Operates")
+    Rel(developer, data_interface, "Operates")
+    Rel(stakeholder, data_interface, "Uses")
+
+
+```
 
 ## Local environment setup (Windows)
 Compatible versions:
@@ -24,7 +39,7 @@ Compatible versions:
 
 Download and install the latest stable releases of the following:
 - [Java Developer Kit 11 (JDK)](https://www.oracle.com/sg/java/technologies/javase/jdk11-archive-downloads.html)
-  - Note: Do not use a later version! Version 11 is used to bypass this permission error specific to creating a spark context on Windows: `java.lang.UnsupportedOperationException: getSubject is supported only if a security manager is allowed` (ref: [StackOverflow reference](https://stackoverflow.com/a/79017758))
+  - _Note: Do not use a later version! Version 11 is used to bypass this permission error specific to creating a spark context on Windows: `java.lang.UnsupportedOperationException: getSubject is supported only if a security manager is allowed` (ref: [StackOverflow reference](https://stackoverflow.com/a/79017758))_
   - Set `JAVA_HOME` env var accordingly
   - Verify that `java -version` is as expected
 - [Scala](https://www.scala-lang.org/download/)
@@ -82,6 +97,7 @@ Download and install the latest stable releases of the following:
 - Run: `spark-submit --class com.tou.App --master local[*] <path/to/jar> <topItemCount> <inputGeolocationFilePath> <inputVideoCameraItemsDetectedFilePath> <outputVideoCameraItemsDetectedByLocationFilePath> <outputTopItemsFilePath>`
   - Example: `spark-submit --class com.tou.App --master local[*] tou-app.jar 3 /opt/geolocation.parquet /opt/videoCameraItemsDetected.parquet /opt/videoCameraItemsDetectedByLocation.parquet /opt/topItems.parquet`
   - Example (with custom log4j settings): `spark-submit --conf "spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/C:/spark/conf/log4j.properties" --conf "spark.executor.extraJavaOptions=-Dlog4j.configuration=file:/C:/spark/conf/log4j.properties" --class com.tou.App --master local[*] target/scala-2.13/tou-app-assembly-1.0.jar 3 artifacts/geolocation.parquet artifacts/videoCameraItemsDetected.parquet /opt/videoCameraItemsDetectedByLocation.parquet /opt/topItems.parquet`
+
 ### Containerized
 - Run Docker Desktop
 - Build: `docker build --progress=plain -t tou-app:latest .`
@@ -97,3 +113,41 @@ Download and install the latest stable releases of the following:
   - Upload image to container registry
   - Create GKE (Google Kubernetes Engine) cluster
   - Deploy to GKE
+- _Note: CI/CD is not implemented_
+
+### Unit tests
+- Start the sbt server:
+  ```bash
+  sbt
+  ```
+  Expect some logs similar to:
+  ```
+  [info] welcome to sbt 1.10.6 (Oracle Corporation Java 11.0.24)
+  [info] loading settings for project sparkly-scala-build from plugins.sbt...
+  [info] loading project definition from C:\Users\tommy\sparkly-scala\project
+  [info] loading settings for project sparkly-scala from build.sbt...
+  [info] set current project to tou-app (in build file:/C:/Users/tommy/sparkly-scala/)
+  [info] sbt server started at local:sbt-server-342fb03d9226c4625193
+  [info] started sbt server
+  ```
+- In the sbt shell, run the unit tests
+  ```bash
+  test
+  ```
+  Expect some logs similar to:
+  ```
+  [info] DataProducerTest:
+  [info] - importOrGenerateData should read from Parquet if file exists
+  [info] - importOrGenerateData should generate= data if the file is missing
+  [info] - importOrGenerateData should throw an exception for unsupported schema
+  [info] Run completed in 10 seconds, 575 milliseconds.
+  [info] Total number of tests run: 3
+  [info] Suites: completed 1, aborted 0
+  [info] Tests: succeeded 3, failed 0, canceled 0, ignored 0, pending 0
+  [info] All tests passed.
+  [success] Total time: 12 s, completed 18 Dec 2024, 10:37:27 PM
+  ```
+- Exit the sbt shell
+  ```bash
+  exit
+  ```
