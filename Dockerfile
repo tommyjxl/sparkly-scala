@@ -4,7 +4,7 @@ ENV SPARK_VERSION=3.5.3
 ENV SCALA_VERSION=2.12.18
 ENV HADOOP_VERSION=3
 
-ENV TOU_TEMP_DIR="/opt/tmp"
+ENV TOU_TEMP_DIR="/tmp"
 ENV TOU_ARTIFACTS_DIR="/opt/artifacts"
 
 # procps (ps command) is not included in the slim package.

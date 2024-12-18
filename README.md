@@ -35,7 +35,7 @@ C4Context
 ## Local environment setup (Windows)
 Compatible versions:
 - JDK 11
-- Scala 2.13.15
+- Scala 2.13.15 (2.12.18 when using Docker)
 - Spark 3.5.3
 - Docker Engine 27.3.1
 - Docker Desktop 4.36.0
@@ -88,7 +88,7 @@ Download and install the latest stable releases of the following:
 - Compile
   - Using `scalac`: 
     ```bash
-    scalac -cp "C:\spark\jars\*" src/main/scala/com/tou/global/*.scala src/main/scala/com/tou/producer/*.scala src/main/scala/com/tou/processor/*.scala -d utopia-app.jar -explain
+    scalac -version 2.13.15 -cp "C:\spark\jars\*" src/main/scala/com/tou/global/*.scala src/main/scala/com/tou/producer/*.scala src/main/scala/com/tou/processor/*.scala -d utopia-app.jar -explain
     ```
   - _Note: Update `C:\spark\jars\*` to the corresponding location of your spark jars, or use an env var, eg. `$env:SPARK_HOME\jars\*` for Windows Powershell_
   - Verify that `tou-app.jar` was created
