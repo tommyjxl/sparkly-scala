@@ -11,6 +11,13 @@ Hard requirements:
 - All data transformations (excluding file I/O and logging) must be done using Resilient Distributed Datasets (RDDs)
 - The video camera data should be augmented with minimal time/space complexity, and minimal shuffling of data
 
+## Quickstart
+Make sure [docker](https://www.docker.com) is installed, then run:
+```bash
+docker build --progress=plain -t tou-app:latest .
+docker run --rm tou-app:latest
+````
+
 ## Architecture overview
 System context:
 ```mermaid
